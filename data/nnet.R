@@ -23,7 +23,7 @@ backprop <- function(layer,n1,n2,factor){ # recursive function used for back-pro
  
    net[[layer]][n1,n2] <<- net[[layer]][n1,n2] - ALPHA*factor*r[[layer]][n2]
 }
-netlearns <- function(x,truth) { # like netsays but changes weights
+netlearns <- function(x,truth){ # like netsays but changes weights
   r <<- list() # to contain the outputs of all nodes in all layers
   r[[1]] <<- x # the input layer
   for(layer in 1:nlayers) r[[layer+1]] <<- as.vector(1/(1+exp(-net[[layer]] %*% r[[layer]])))
@@ -32,11 +32,19 @@ netlearns <- function(x,truth) { # like netsays but changes weights
 }
 
 # SAMPLE 1 ----
-
+set.seed(123)
 sample1 <- read.table("Sample1", header = FALSE)
-truth1 <-  sample1[,1]
-sample1t <- sample1[,-1]
+sample<- sample.int(n = nrow(sample1), size = floor(.75*nrow(sample1)), replace = F)
+train1 <- sample1[sample, ]
+test1  <- sample1[-sample, ]
 
+
+truth1_train <-  train1[,1]
+sample1t_train <- train1[,-1]
+
+
+truth1_test <-  test1[,1]
+sample1t_test <- test1[,-1]
 
 #Initial pred
 
@@ -51,24 +59,67 @@ netlearns(v1,truth1[i])
 #backprop(3,1,1,badness)
 
 
-#Test 4loop for sigmoid----
-v1 <- as.numeric(sample1t[1,])
-v1 <-  sample1t
+#Training 4loop for sigmoid----
+#v1 <- as.numeric(sample1t[1,])
+set.seed(333)
+for(j in 1:nlayers) net[[ j ]] <- matrix(runif(nodes[ j ]*nodes[j+1]),nodes[j+1],nodes[j])
+
+v1 <-  sample1t_train
 bad <-c() 
 pred <- c()
-for(i in 1:50){
+
+truth1_test <-  test1[,1]
+sample1t_test <- test1[,-1]
+predTest <- c()
+badTest <- c()
+
+for(i in 1:100){
   for(j in 1:nrow(v1)){
   pred[j] <- netsays(as.numeric(v1[j,]))
   }
-  bad[i] <- mean(1/2*((pred-truth1)^2))
+  bad[i] <- mean(1/2*((pred-truth1_train)^2))
   #bad[i] <-1/2*(pred-truth1)^2
   for(j in 1:nrow(v1)){
-  netlearns(as.numeric(v1[j,]),truth1[j])
+  netlearns(as.numeric(v1[j,]),truth1_train[j])
   }
+  for(j in 1:nrow(sample1t_test)){
+    predTest[j] <- netsays(as.numeric(sample1t_test[j,]))
+    }
+    badTest[i] <- mean(1/2*((predTest-truth1_test)^2))
   print(bad[i])
 }
-plot(bad, type = "l")
+plot(bad, type = "l", ylim = c(0,.25));par(new=TRUE)
+plot(badTest, type = "o", col = "blue", ylim = c(0,.25))
 
 #Saving the results for the first sample
 pred1<-pred
 bad1 <- bad
+
+# SAMPLE 2 ------------------------------------------------------------
+setwd("~/Documents/NNEts_exc/data")
+sample2 <- read.table("Sample2", header = FALSE)
+truth2 <-  sample2[,2]
+sample2t <- sample2[,-1]
+
+
+#Test 4loop for sigmoid----
+v2 <- as.numeric(sample2t[1,])
+v2 <-  sample2t
+bad2 <-c() 
+pred2 <- c()
+for(i in 1:50){
+  for(j in 1:nrow(v2)){
+    pred2[j] <- netsays(as.numeric(v2[j,]))
+  }
+  bad2[i] <- mean(1/2*((pred2-truth2)^2))
+  #bad[i] <-1/2*(pred-truth1)^2
+  for(j in 1:nrow(v2)){
+    netlearns(as.numeric(v2[j,]),truth2[j])
+  }
+  print(bad2[i])
+}
+plot(bad2, type = "l")
+
+#Saving the results for the first sample
+pred2<-pred2
+bad2 <- bad2
