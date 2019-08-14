@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1565770258935.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2495773338",
+    "id" : "DC56AB3",
+    "lastKnownWriteTime" : 1565770446,
+    "last_content_update" : 1565770446408,
+    "path" : "~/Documents/NNEts_exc/nnet.R",
+    "project_path" : "nnet.R",
+    "properties" : {
+        "cursorPosition" : "0,13",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
