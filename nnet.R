@@ -7,7 +7,7 @@ net=list() # set up empty list
 
 # Create weights fo each set of nodes ----
 # make weights and fill with random numbers
-for(j in 1:nlayers) net[[ j ]] <- matrix(runif(nodes[ j ]*nodes[ j +1 ]),nodes[j+1],nodes[j])
+for(j in 1:nlayers) net[[ j ]] <- matrix(runif(nodes[ j ]*nodes[j+1]),nodes[j+1],nodes[j])
 
 # Apply the weights to the test file and re-scale with the sigmoid funtion
 netsays <- function(x) { # Returns net output for some input vector x
@@ -33,5 +33,7 @@ sample1 <- read.table("Sample1", header = FALSE)
 truth1 <-  sample1[,1]
 sample1t <- sample1[,-1]
 
-v1 <- as.vector(sample1t[1,])
+
+#Initial pred
+v1 <- as.numeric(sample1t[1,])
 netsays(v1)

@@ -6,18 +6,22 @@ net=list() # set up empty list
 # net[[ j ]] holds weight matrix feeding nodes of layer j+1 from nodes in layer j
 
 # Create weights fo each set of nodes ----
-# make weights and fill with random numbers
-for(j in 1:nlayers) net[[ j ]] <- matrix(runif(nodes[ j ]*nodes[ j +1 ]),nodes[j+1],nodes[j])
 
-# Apply the weights to the test file and re-scale with the sigmoid funtion
+# make weights and fill with random numbers
+set.seed(123)
+for(j in 1:nlayers) net[[ j ]] <- matrix(runif(nodes[ j ]*nodes[j+1]),nodes[j+1],nodes[j])
+
+# Apply the weights to the test file and re-scale with the sigmoid funtion ----
 netsays <- function(x) { # Returns net output for some input vector x
   for(j in 1:nlayers) x <- 1/(1+exp(-net[[ j ]] %*% x))  #compare with the tanh function
   return(x)
 }
+# DONT TOUCH ----
 backprop <- function(layer,n1,n2,factor){ # recursive function used for back-propagation
-  if(layer>1) for(n in 1:nodes[layer-1])
+    if(layer>1) for(n in 1:nodes[layer-1])
     backprop(layer-1,n2,n,factor*net[[layer]][n1,n2]*r[[layer]][n2]*(1-r[[layer]][n2]))
-  net[[layer]][n1,n2] <<- net[[layer]][n1,n2] - ALPHA*factor*r[[layer]][n2]
+ 
+   net[[layer]][n1,n2] <<- net[[layer]][n1,n2] - ALPHA*factor*r[[layer]][n2]
 }
 netlearns <- function(x,truth) { # like netsays but changes weights
   r <<- list() # to contain the outputs of all nodes in all layers
@@ -27,11 +31,44 @@ netlearns <- function(x,truth) { # like netsays but changes weights
   for(n in 1:nodes[nlayers]) backprop(nlayers,1,n,(u-truth)*u*(1-u))
 }
 
-# Test1 ----
+# SAMPLE 1 ----
 
 sample1 <- read.table("Sample1", header = FALSE)
 truth1 <-  sample1[,1]
 sample1t <- sample1[,-1]
 
-v1 <- as.numeric(sample1t[,1])
-netsays(v1)
+
+#Initial pred
+
+v1 <- as.numeric(sample1t[1,])
+pred <- netsays(v1)
+#net2 <- net
+#Backprop ----
+#i=1
+badness <-1/2*(pred-truth1[i])^2 
+
+netlearns(v1,truth1[i])
+#backprop(3,1,1,badness)
+
+
+#Test 4loop for sigmoid----
+v1 <- as.numeric(sample1t[1,])
+v1 <-  sample1t
+bad <-c() 
+pred <- c()
+for(i in 1:50){
+  for(j in 1:nrow(v1)){
+  pred[j] <- netsays(as.numeric(v1[j,]))
+  }
+  bad[i] <- mean(1/2*((pred-truth1)^2))
+  #bad[i] <-1/2*(pred-truth1)^2
+  for(j in 1:nrow(v1)){
+  netlearns(as.numeric(v1[j,]),truth1[j])
+  }
+  print(bad[i])
+}
+plot(bad, type = "l")
+
+#Saving the results for the first sample
+pred1<-pred
+bad1 <- bad
