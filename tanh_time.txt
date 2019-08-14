@@ -1,0 +1,6 @@
+#in netlearns and netsays
+tanh( net[[ j ]] )
+
+#in function netlearns
+for(n in 1:nodes[nlayers]) backprop(nlayers,1,n,(u-truth) (1+u ** 2)   )
+
