@@ -96,29 +96,49 @@ pred1<-pred
 bad1 <- bad
 
 # SAMPLE 2 ------------------------------------------------------------
-setwd("~/Documents/NNEts_exc/data")
+set.seed(123)
 sample2 <- read.table("Sample2", header = FALSE)
-truth2 <-  sample2[,2]
-sample2t <- sample2[,-1]
+sample<- sample.int(n = nrow(sample2), size = floor(.75*nrow(sample2)), replace = F)
+train2 <- sample2[sample, ]
+test2  <- sample2[-sample, ]
 
+
+truth2_train <-  train2[,1]
+sample2t_train <- train2[,-1]
+
+
+truth2_test <-  test2[,1]
+sample2t_test <- test2[,-1]
 
 #Test 4loop for sigmoid----
-v2 <- as.numeric(sample2t[1,])
-v2 <-  sample2t
+v2 <-  sample2t_train
 bad2 <-c() 
 pred2 <- c()
-for(i in 1:50){
+
+truth2_test <-  test2[,1]
+sample2t_test <- test2[,-1]
+predTest2 <- c()
+badTest2 <- c()
+
+#Sample 2 with sigmoid
+for(i in 1:100){
   for(j in 1:nrow(v2)){
     pred2[j] <- netsays(as.numeric(v2[j,]))
   }
-  bad2[i] <- mean(1/2*((pred2-truth2)^2))
+  bad2[i] <- mean(1/2*((pred2-truth2_train)^2))
   #bad[i] <-1/2*(pred-truth1)^2
   for(j in 1:nrow(v2)){
-    netlearns(as.numeric(v2[j,]),truth2[j])
+    netlearns(as.numeric(v2[j,]),truth2_train[j])
   }
+  for(j in 1:nrow(sample2t_test)){
+    predTest2[j] <- netsays(as.numeric(sample2t_test[j,]))
+  }
+  badTest2[i] <- mean(1/2*((predTest2-truth2_test)^2))
   print(bad2[i])
 }
-plot(bad2, type = "l")
+plot(bad2, type = "l", ylim = c(0,.25));par(new=TRUE)
+plot(badTest2, type = "o", col = "blue", ylim = c(0,.25))
+
 
 #Saving the results for the first sample
 pred2<-pred2
