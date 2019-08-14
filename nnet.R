@@ -1,13 +1,17 @@
 # Code example from slidwes
 ALPHA=0.05 # learning parameter
-nodes=c(5,7,10,1) # 5 inputs, 2 hidden layers, with 7 and 10 nodes , 1 output
+nodes=c(5,8,5,1) # 5 inputs, 2 hidden layers, with 7 and 10 nodes , 1 output
 nlayers=length(nodes) -1 # 3 sets of weights
 net=list() # set up empty list
 # net[[ j ]] holds weight matrix feeding nodes of layer j+1 from nodes in layer j
+
+# Create weights fo each set of nodes ----
 # make weights and fill with random numbers
 for(j in 1:nlayers) net[[ j ]] <- matrix(runif(nodes[ j ]*nodes[ j +1 ]),nodes[j+1],nodes[j])
+
+# Apply the weights to the test file and re-scale with the sigmoid funtion
 netsays <- function(x) { # Returns net output for some input vector x
-  for(j in 1:nlayers) x <- 1/(1+exp(-net[[ j ]] %*% x))
+  for(j in 1:nlayers) x <- 1/(1+exp(-net[[ j ]] %*% x))  #compare with the tanh function
   return(x)
 }
 backprop <- function(layer,n1,n2,factor){ # recursive function used for back-propagation
@@ -22,3 +26,12 @@ netlearns <- function(x,truth) { # like netsays but changes weights
   u <- r[[nlayers+1]] # final answer, for convenience
   for(n in 1:nodes[nlayers]) backprop(nlayers,1,n,(u-truth)*u*(1-u))
 }
+
+# Test1 ----
+
+sample1 <- read.table("Sample1", header = FALSE)
+truth1 <-  sample1[,1]
+sample1t <- sample1[,-1]
+
+v1 <- as.vector(sample1t[1,])
+netsays(v1)
